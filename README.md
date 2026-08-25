@@ -99,10 +99,13 @@ type Call func(times int) (time.Duration, error)
 | `ErrorNum`     | `error_num`      | 失败请求数           |
 | `SuccessNum`   | `success_num`    | 成功请求数           |
 | `SuccessRate`  | `success_rate`   | 成功率（保留 4 位小数） |
-| `Err`          | `err`            | 错误列表             |
+| `Err`          | `err`            | 错误列表（最多保留 100 条） |
 | `FunctionName` | `function_name`  | 被压测的函数名       |
 
 ## 注意事项
 
 - 结果中的耗时字段单位均为**毫秒**，`Call` 返回值为 `time.Duration`（纳秒），由库统一换算。
 - `SuccessRate` 为字符串类型，格式形如 `1.0000`。
+- `Qps` 为实测吞吐量（总请求数 ÷ 实际总耗时），而非理论估算值。
+- 当 `total`、`goroutine` 小于等于 0，或压测函数为 `nil` 时，不会执行压测，直接返回零值结果。
+- `Err` 最多保留 100 条错误，其余错误只计入 `ErrorNum`，避免大失败量下内存无限增长。
